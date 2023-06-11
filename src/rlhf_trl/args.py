@@ -29,6 +29,13 @@ class ScriptArgs:
         },
     )
 
+    dataset_path: str | None = field(
+        default='',
+        metadata={
+            'help': 'The path to the dataset.',
+        },
+    )
+
     log_with: str | None = field(
         default='wandb',
         metadata={
@@ -47,6 +54,13 @@ class ScriptArgs:
         default=1024,
         metadata={
             'help': 'The maximum length of the output sequence for generation.',
+        },
+    )
+
+    output_min_length: int | None = field(
+        default=32,
+        metadata={
+            'help': 'The minimum length of the output sequence for generation.',
         },
     )
 

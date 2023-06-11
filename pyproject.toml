@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rlhf-trl"
-version = "0.1.0"
+version = "0.1.2"
 description = "Reinforcement Learning from Human Feedback with TRL"
 
 authors = ["Victor I. Afolabi <javafolabi@gmail.com>"]
@@ -45,6 +45,7 @@ trl = "^0.4.4"
 jsonlines = "^3.1.0"
 tqdm = "^4.65.0"
 datasets = "^2.12.0"
+peft = "^0.3.0"
 
 
 [tool.poetry.group.dev.dependencies]

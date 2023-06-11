@@ -1038,6 +1038,32 @@ test = ["hypothesis (>=6.34.2)", "pytest (>=7.0.0)", "pytest-asyncio (>=0.17.0)"
 xml = ["lxml (>=4.6.3)"]
 
 [[package]]
+name = "peft"
+version = "0.3.0"
+description = "Parameter-Efficient Fine-Tuning (PEFT)"
+optional = false
+python-versions = ">=3.7.0"
+files = [
+    {file = "peft-0.3.0-py3-none-any.whl", hash = "sha256:824c2ba148febb743c70363e597dafb35d996e075956ad7bc36506f09fea0349"},
+    {file = "peft-0.3.0.tar.gz", hash = "sha256:bbdeee4de3653ee43cb6bbe7505816e6e9b4cf8275471be1707d9c253dfe8e0b"},
+]
+
+[package.dependencies]
+accelerate = "*"
+numpy = ">=1.17"
+packaging = ">=20.0"
+psutil = "*"
+pyyaml = "*"
+torch = ">=1.13.0"
+transformers = "*"
+
+[package.extras]
+dev = ["black (>=22.0,<23.0)", "hf-doc-builder", "ruff (>=0.0.241)"]
+docs-specific = ["hf-doc-builder"]
+quality = ["black (>=22.0,<23.0)", "ruff (>=0.0.241)"]
+test = ["black (>=22.0,<23.0)", "datasets", "hf-doc-builder", "parameterized", "pytest", "pytest-xdist", "ruff (>=0.0.241)"]
+
+[[package]]
 name = "platformdirs"
 version = "3.5.3"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -1975,4 +2001,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8cb143c697228fd0c50519befffad7a46d12a947433aefbff21bc970bdb79004"
+content-hash = "f38d185500991959db1514a337afb5ca96cc13627718b9f167bdb3eec43b876a"
