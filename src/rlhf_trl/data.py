@@ -1,7 +1,9 @@
 import os
+
 import jsonlines
 import tqdm
-from datasets import Dataset, Split
+from datasets import Dataset
+from datasets import Split
 from transformers import AutoTokenizer
 
 
@@ -50,12 +52,37 @@ def load_data(
         if max_size is not None and len(prompts) >= max_size:
             break
 
-    ds = Dataset.from_dict({
-        'prompts': prompts,
-        'input_ids': input_ids,
-    }, split=Split.TRAIN if split == 'train' else Split.TEST)
+    ds = Dataset.from_dict(
+        {
+            'prompts': prompts,
+            'input_ids': input_ids,
+        }, split=Split.TRAIN if split == 'train' else Split.TEST,
+    )
 
     ds = ds.filter(lambda x: len(x['input_ids']) <= max_token, batched=False)
-    ds.set_format(type='torch', columns=['input_ids'])
+    ds.set_format(type='torch')  # , columns=['input_ids'])
 
     return ds
+
+
+def get_tokenizer(
+    tokenizer_name: str,
+    pad_token_as_eos: bool = True,
+) -> AutoTokenizer:
+    """Get the tokenizer.
+
+    Args:
+        tokenizer_name: Name of the tokenizer.
+        pad_token_as_eos: Whether to use the pad token as the eos token.
+            Defaults to True.
+
+    Returns:
+        AutoTokenizer: The tokenizer.
+
+    """
+    tokenizer =  AutoTokenizer.from_pretrained(tokenizer_name)
+
+    if pad_token_as_eos and get_tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    return tokenizer
