@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import Any
 
+import torch
 from accelerate import Accelerator
 from datasets import Dataset
 from rlhf_trl.args import ScriptArgs
@@ -50,7 +51,7 @@ def build_trainer(
     # ref_model = create_reference_model(model, num_shared_layers=6)
     ref_model = None
 
-    optimizer = None
+    optimizer, lr_scheduler = None, None
     if args.adafactor:
         optimizer = Adafactor(
             filter(lambda p: p.requires_grad, model.parameters()),
@@ -59,6 +60,8 @@ def build_trainer(
             warmup_init=False,
             lr=config.learning_rate,
         )
+        lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=args.lr_gamma)
+
     trainer = PPOTrainer(
         config=config,
         model=model,
@@ -67,6 +70,7 @@ def build_trainer(
         dataset=dataset,
         data_collator=data_collator,
         optimizer=optimizer,
+        lr_scheduler=lr_scheduler,
     )
 
     return config, trainer

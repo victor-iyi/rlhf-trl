@@ -17,8 +17,8 @@ def get_ppo_config(args: ScriptArgs) -> PPOConfig:
 
     """
     config = PPOConfig(
-        steps=args.steps,
         model_name=args.model_name,
+        steps=args.steps,
         learning_rate=args.learning_rate,
         log_with=args.log_with,
         batch_size=args.batch_size,
@@ -31,6 +31,7 @@ def get_ppo_config(args: ScriptArgs) -> PPOConfig:
         seed=args.seed,
         init_kl_coef=args.init_kl_coef,
         adap_kl_ctrl=args.adap_kl_ctrl,
+        tracker_project_name=args.project_name,
     )
 
     return config

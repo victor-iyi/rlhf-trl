@@ -72,14 +72,14 @@ class ScriptArgs:
     )
 
     batch_size: int | None = field(
-        default=16,
+        default=8,
         metadata={
             'help': 'The batch size to use for PPO.',
         },
     )
 
     ppo_epochs: int | None = field(
-        default=20,
+        default=50,
         metadata={
             'help': 'The number of PPO epochs.',
         },
@@ -128,16 +128,23 @@ class ScriptArgs:
     )
 
     save_freq: int | None = field(
-        default=50,
+        default=20,
         metadata={
             'help': 'The frequency with which to save the model.',
         },
     )
 
     output_dir: str | None = field(
-        default='experiments/',
+        default='experiments',
         metadata={
             'help': 'The output directory.',
+        },
+    )
+
+    project_name: str | None = field(
+        default='rlhf-trl',
+        metadata={
+            'help': 'The name of the tracker project.',
         },
     )
 
@@ -149,9 +156,16 @@ class ScriptArgs:
     )
 
     steps: int | None = field(
-        default=20_000,
+        default=50_000,
         metadata={
             'help': 'The number of training steps.',
+        },
+    )
+
+    lr_gamma: float | None = field(
+        default=0.9,
+        metadata={
+            'help': 'The learning rate scheduler gamma.',
         },
     )
 

@@ -31,7 +31,8 @@ def reward_fn(
             truncation=True,
             max_length=512,
             padding='max_length',
-            return_tensors='pt')
+            return_tensors='pt',
+        )
         encoding = encoding.to(device)
 
         logits = model(**encoding).logits

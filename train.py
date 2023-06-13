@@ -1,8 +1,11 @@
+import os
+import time
+
 import torch
 from rlhf_trl.args import parse_args
+from rlhf_trl.data import collator
 from rlhf_trl.data import get_tokenizer
 from rlhf_trl.data import load_data
-from rlhf_trl.data import collator
 from rlhf_trl.reward import reward_fn
 from rlhf_trl.trainer import build_trainer
 from tqdm import tqdm
@@ -60,6 +63,7 @@ def main() -> None:
     )
 
     print(f'Using device: {device}')
+    start_time = time.time()
     # Training loop.
     for epoch, batch in tqdm(enumerate(ppo_trainer.dataloader), desc='Training PPO'):
         if epoch >= config.total_ppo_epochs:
@@ -96,7 +100,15 @@ def main() -> None:
 
         # Save the model.
         if args.save_freq and epoch and epoch % args.save_freq == 0:
-            ppo_trainer.save_pretrained(f'{args.output_dir}-{epoch}')
+            ppo_trainer.save_pretrained(os.path.join(args.output_dir, f'ppo-{epoch}', 'model'))
+
+    elapsed_time = time.time() - start_time
+    mins, secs = divmod(elapsed_time, 60)
+    hours, mins = divmod(mins, 60)
+    print(f'Training took {hours:.0f}h, {mins:.0f}m {secs:.0f}s.')
+
+    print('\nSaving model!')
+    ppo_trainer.save_pretrained(os.path.join(args.output_dir, 'model'))
 
 
 if __name__ == '__main__':
