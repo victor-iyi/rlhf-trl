@@ -36,7 +36,7 @@ def reward_fn(
         encoding = encoding.to(device)
 
         logits = model(**encoding).logits
-        scores = logits.cpu().numpy().tolist()
+        scores = logits.cpu().numpy().flatten().tolist()
 
         return scores
 

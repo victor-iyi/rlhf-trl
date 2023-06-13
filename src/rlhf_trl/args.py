@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from dataclasses import field
+from datetime import datetime as dt
 
 from transformers import HfArgumentParser
 
@@ -8,10 +9,10 @@ from transformers import HfArgumentParser
 class ScriptArgs:
     """The name of the Causal LM wwe wish to fine-tune with PPO."""
 
-    model_name: str | None = field(
+    sft_model_name: str | None = field(
         default='YurtsAI/qa-manuals-pythia-2.8b-lr-1e-5-cl-2048-epoch-1_file0_step215_totaltokens1.7613M',
         metadata={
-            'help': 'The name of the Causal LM wwe wish to fine-tune with PPO.',
+            'help': 'The name of the SFT model we wish to fine-tune with PPO.',
         },
     )
 
@@ -29,10 +30,52 @@ class ScriptArgs:
         },
     )
 
+    ppo_model_name: str | None = field(
+        default='',
+        metadata={
+            'help': 'The name of the PPO model to use for evaluation only.',
+        },
+    )
+
     dataset_path: str | None = field(
         default='res/tech-crunch-qa/',
         metadata={
             'help': 'The path to the dataset.',
+        },
+    )
+
+    run_name: str | None = field(
+        default=f'rlhf-{dt.now():%d-%m-%Y-%H_%M_%S}',
+        metadata={
+            'help': 'The name of the experiment.',
+        },
+    )
+
+    eval_save_path: str | None = field(
+        default='res/eval/',
+        metadata={
+            'help': 'The path to save the evaluation results.',
+        },
+    )
+
+    eval_name: str | None = field(
+        default='tech-crunch-qa',
+        metadata={
+            'help': 'The name of the evaluation file.',
+        },
+    )
+
+    output_dir: str | None = field(
+        default='experiments',
+        metadata={
+            'help': 'The output directory.',
+        },
+    )
+
+    project_name: str | None = field(
+        default='RLHF-TRL',
+        metadata={
+            'help': 'The name of the tracker project.',
         },
     )
 
@@ -86,7 +129,7 @@ class ScriptArgs:
     )
 
     gradient_accumulation_steps: int | None = field(
-        default=4,
+        default=2,
         metadata={
             'help': 'The number of gradient accumulation steps.',
         },
@@ -128,23 +171,9 @@ class ScriptArgs:
     )
 
     save_freq: int | None = field(
-        default=20,
+        default=10,
         metadata={
             'help': 'The frequency with which to save the model.',
-        },
-    )
-
-    output_dir: str | None = field(
-        default='experiments',
-        metadata={
-            'help': 'The output directory.',
-        },
-    )
-
-    project_name: str | None = field(
-        default='rlhf-trl',
-        metadata={
-            'help': 'The name of the tracker project.',
         },
     )
 
@@ -156,7 +185,7 @@ class ScriptArgs:
     )
 
     steps: int | None = field(
-        default=50_000,
+        default=100_000,
         metadata={
             'help': 'The number of training steps.',
         },

@@ -22,10 +22,10 @@ def main() -> None:
 
     # Tokenizer & dataset.
     tokenizer = get_tokenizer(args.tokenizer_name)
-    dataset = load_data(args.dataset_path, tokenizer, split='train')
+    dataset = load_data(args.dataset_path, tokenizer, split='all')
 
     # PPO Trainer.
-    config, ppo_trainer = build_trainer(
+    _, ppo_trainer = build_trainer(
         args=args,
         tokenizer=tokenizer,
         dataset=dataset,
@@ -62,12 +62,12 @@ def main() -> None:
         args.reward_model_name,
     )
 
-    print(f'Using device: {device}')
+    ppo_trainer.accelerator.print(f'Using device: {device}')
     start_time = time.time()
     # Training loop.
     for epoch, batch in tqdm(enumerate(ppo_trainer.dataloader), desc='Training PPO'):
-        if epoch >= config.total_ppo_epochs:
-            break
+        # if epoch >= config.total_ppo_epochs:
+        #     break
 
         prompt_tensors = batch['input_ids']
         response_tensors = ppo_trainer.generate(
@@ -90,7 +90,7 @@ def main() -> None:
             device=device,
         )
         rewards = [
-            torch.tensor(score[0] - args.reward_baseline)
+            torch.tensor(score - args.reward_baseline)
             for score in scores
         ]
 
@@ -100,15 +100,29 @@ def main() -> None:
 
         # Save the model.
         if args.save_freq and epoch and epoch % args.save_freq == 0:
-            ppo_trainer.save_pretrained(os.path.join(args.output_dir, f'ppo-{epoch}', 'model'))
+            ppo_trainer.save_pretrained(
+                os.path.join(
+                    args.output_dir,
+                    args.project_name,
+                    args.run_name,
+                    f'checkpoint-{epoch}',
+                ),
+            )
 
     elapsed_time = time.time() - start_time
     mins, secs = divmod(elapsed_time, 60)
     hours, mins = divmod(mins, 60)
-    print(f'Training took {hours:.0f}h, {mins:.0f}m {secs:.0f}s.')
+    ppo_trainer.accelerator.print(f'Training took {hours:.0f}h {mins:.0f}m {secs:.0f}s.')
 
-    print('\nSaving model!')
-    ppo_trainer.save_pretrained(os.path.join(args.output_dir, 'model'))
+    ppo_trainer.accelerator.print('\nSaving model!')
+    ppo_trainer.save_pretrained(
+        os.path.join(
+            args.output_dir,
+            args.project_name,
+            args.run_name,
+            'model',
+        ),
+    )
 
 
 if __name__ == '__main__':

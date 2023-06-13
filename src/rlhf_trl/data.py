@@ -12,6 +12,7 @@ def load_data(
     path: str,
     tokenizer: AutoTokenizer,
     split: str = 'train',
+    return_answers: bool = False,
     max_size: int | None = None,
     max_token: int = 1024,
 ) -> Dataset:
@@ -27,7 +28,7 @@ def load_data(
         Dataset: The dataset.
 
     """
-    assert split in ['train', 'test'], 'split must be either train or test.'
+    assert split in ['train', 'test', 'all'], 'split must be either train, test or all.'
 
     path = os.path.join(path, f'{split}.jsonl')
     if not os.path.exists(path):
@@ -37,6 +38,9 @@ def load_data(
         data = [obj for obj in reader]
 
     prompts, input_ids = [], []
+    if return_answers:
+        oa_ans, cgpt_ans = [], []
+
     qa_prompt: str = '<|prompter|>{}<|endoftext|><|assistant|>'
 
     for obj in tqdm.tqdm(
@@ -50,14 +54,30 @@ def load_data(
         tokenized_prompt = tokenizer(prompt, truncation=True)
         input_ids.append(tokenized_prompt['input_ids'])
 
+        if return_answers:
+            oa_ans.append(obj['openassistant-answer'])
+            cgpt_ans.append(obj['chatgpt-answer'])
+
         if max_size is not None and len(prompts) >= max_size:
             break
 
-    ds = Dataset.from_dict(
-        {
+    if return_answers:
+        mapping = {
             'query': prompts,
             'input_ids': input_ids,
-        }, split=Split.TRAIN if split == 'train' else Split.TEST,
+            'openassistant-answer': oa_ans,
+            'chatgpt-answer': cgpt_ans,
+        }
+    else:
+        mapping = {
+            'query': prompts,
+            'input_ids': input_ids,
+        }
+
+    split = 'train' if split == 'all' else split
+    ds = Dataset.from_dict(
+        mapping,
+        split=Split.TRAIN if split == 'train' else Split.TEST,
     )
 
     ds = ds.filter(lambda x: len(x['input_ids']) <= max_token, batched=False)
@@ -69,6 +89,7 @@ def load_data(
 def get_tokenizer(
     tokenizer_name: str,
     pad_token_as_eos: bool = True,
+    padding_side: str | None = None,
 ) -> AutoTokenizer:
     """Get the tokenizer.
 
@@ -85,6 +106,10 @@ def get_tokenizer(
 
     if pad_token_as_eos and tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+
+    if padding_side is not None:
+        assert padding_side in ['left', 'right'], 'padding_side must be either left or right.'
+        tokenizer.padding_side = padding_side
 
     return tokenizer
 
