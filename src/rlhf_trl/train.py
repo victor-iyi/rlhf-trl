@@ -1,11 +1,12 @@
 import torch
-from core import get_ner
 from rlhf_trl.args import parse_args
 from rlhf_trl.data import get_tokenizer
 from rlhf_trl.data import load_data
 from rlhf_trl.reward import reward_fn
 from rlhf_trl.trainer import build_trainer
 from tqdm import tqdm
+from transformers import AutoModelForSequenceClassification
+from transformers import AutoTokenizer
 from trl.core import LengthSampler
 
 
@@ -43,8 +44,15 @@ def train() -> None:
             else 'cpu',
         )
 
-    nlp = get_ner(device=device, resolve_text=True, size='small')
+    # Reward model.
+    reward_model = AutoModelForSequenceClassification.from_pretrained(
+        args.reward_model_name,
+    )
+    reward_tokenizer = AutoTokenizer.from_pretrained(
+        args.reward_model_name,
+    )
 
+    # Training loop.
     for epoch, batch in tqdm(enumerate(ppo_trainer.dataloader)):
         if epoch >= config.total_ppo_epochs:
             break
@@ -62,8 +70,17 @@ def train() -> None:
         )
 
         # TODO: Compute reward score.
-        scores = reward_fn(nlp, batch['prompt'], batch['response'])
-        rewards = [torch.tensor(score[0] - args.reward_baseline) for score in scores]
+        scores = reward_fn(
+            model=reward_model,
+            tokenizer=reward_tokenizer,
+            prompt_text=batch['prompt'],
+            response_text=batch['response'],
+            device=device,
+        )
+        rewards = [
+            torch.tensor(score[0] - args.reward_baseline)
+            for score in scores
+        ]
 
         # TODO: Run the PPO step.
         stats = ppo_trainer.step(prompt_tensors, response_tensors, rewards)

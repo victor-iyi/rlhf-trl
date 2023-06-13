@@ -30,7 +30,7 @@ def load_data(
     """
     assert split in ['train', 'test'], 'split must be either train or test.'
 
-    path = os.path.join(path, f'tech-crunch-qa-{split}.jsonl')
+    path = os.path.join(path, f'{split}.jsonl')
     if os.path.exists(path):
         raise FileNotFoundError(f'{path} does not exist.')
 

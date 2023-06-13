@@ -9,28 +9,28 @@ class ScriptArgs:
     """The name of the Causal LM wwe wish to fine-tune with PPO."""
 
     model_name: str | None = field(
-        default='',
+        default='YurtsAI/qa-manuals-pythia-2.8b-lr-1e-5-cl-2048-epoch-1_file0_step215_totaltokens1.7613M',
         metadata={
             'help': 'The name of the Causal LM wwe wish to fine-tune with PPO.',
         },
     )
 
     tokenizer_name: str | None = field(
-        default='',
+        default='OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
         metadata={
             'help': 'The name of the tokenizer to use.',
         },
     )
 
     reward_model_name: str | None = field(
-        default='',
+        default='OpenAssistant/reward-model-deberta-v3-base',
         metadata={
             'help': 'The name of the reward model to use.',
         },
     )
 
     dataset_path: str | None = field(
-        default='',
+        default='res/tech-crunch-qa/',
         metadata={
             'help': 'The path to the dataset.',
         },
@@ -135,7 +135,7 @@ class ScriptArgs:
     )
 
     output_dir: str | None = field(
-        default='runs/',
+        default='experiments/',
         metadata={
             'help': 'The output directory.',
         },
