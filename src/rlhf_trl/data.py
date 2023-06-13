@@ -30,14 +30,15 @@ def load_data(
     assert split in ['train', 'test'], 'split must be either train or test.'
 
     path = os.path.join(path, f'{split}.jsonl')
-    if os.path.exists(path):
+    print(os.path.abspath(path))
+    if not os.path.exists(path):
         raise FileNotFoundError(f'{path} does not exist.')
 
     with jsonlines.open(path) as reader:
         data = [obj for obj in reader]
 
     prompts, input_ids = [], []
-    qa_prompt: str = '<|propmpter|>{}<|endoftext|><|assistant|>'
+    qa_prompt: str = '<|prompter|>{}<|endoftext|><|assistant|>'
 
     for obj in tqdm.tqdm(
         data,

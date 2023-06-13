@@ -7,8 +7,8 @@ from rlhf_trl.args import ScriptArgs
 from rlhf_trl.config import get_lora_config
 from rlhf_trl.config import get_ppo_config
 from transformers import Adafactor
-from transformers import AutoModelForCausalLMWithValueHead
 from transformers import AutoTokenizer
+from trl import AutoModelForCausalLMWithValueHead
 from trl import PPOConfig
 from trl import PPOTrainer
 from trl import set_seed

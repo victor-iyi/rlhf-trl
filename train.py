@@ -12,7 +12,7 @@ from trl.core import LengthSampler
 # from rlhf_trl.data import collator
 
 
-def train() -> None:
+def main() -> None:
     """Train the model."""
 
     # Parse arguments.
@@ -97,3 +97,7 @@ def train() -> None:
         # Save the model.
         if args.save_freq and epoch and epoch % args.save_freq == 0:
             ppo_trainer.save_pretrained(f'{args.output_dir}-{epoch}')
+
+
+if __name__ == '__main__':
+    main()
