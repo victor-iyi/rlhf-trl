@@ -1,5 +1,4 @@
 import os
-from collections.abc import Callable
 from typing import Any
 
 import jsonlines
@@ -90,30 +89,40 @@ def get_tokenizer(
     return tokenizer
 
 
-def collator(
-    tokenizer: AutoTokenizer,
-    max_token: int = 1024,
-) -> Callable[..., Any]:
+# def collator(
+#     tokenizer: AutoTokenizer,
+#     max_token: int = 1024,
+# ) -> Callable[..., Any]:
+#     """Collator function for the dataset.
+#
+#     Args:
+#         tokenizer: The tokenizer.
+#         max_token: Maximum number of tokens in the input.
+#             Defaults to 1024.
+#
+#     Returns:
+#         callable: The collator function.
+#
+#     """
+#     def collate_fn(batch: list[dict[str, Any]]) -> list[dict[str, Any]]:
+#         input_ids = [obj['input_ids'] for obj in batch]
+#         input_ids = tokenizer.pad(
+#             input_ids,
+#             padding=True,
+#             max_length=max_token,
+#             return_tensors='pt',
+#         )
+#
+#         return input_ids
+#
+#     return collate_fn
+
+
+def collator(data: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
     """Collator function for the dataset.
 
     Args:
-        tokenizer: The tokenizer.
-        max_token: Maximum number of tokens in the input.
-            Defaults to 1024.
-
-    Returns:
-        callable: The collator function.
+        data (list[dict[str, Any]]): List of dictionaries.
 
     """
-    def collate_fn(batch: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        input_ids = [obj['input_ids'] for obj in batch]
-        input_ids = tokenizer.pad(
-            input_ids,
-            padding=True,
-            max_length=max_token,
-            return_tensors='pt',
-        )
-
-        return input_ids
-
-    return collate_fn
+    return {key: [d[key] for d in data] for key in data[0]}

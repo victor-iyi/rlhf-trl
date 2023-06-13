@@ -7,7 +7,9 @@ from rlhf_trl.trainer import build_trainer
 from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification
 from transformers import AutoTokenizer
+from transformers import DataCollatorWithPadding
 from trl.core import LengthSampler
+# from rlhf_trl.data import collator
 
 
 def train() -> None:
@@ -19,9 +21,15 @@ def train() -> None:
     # Tokenizer & dataset.
     tokenizer = get_tokenizer(args.tokenizer_name)
     dataset = load_data(args.dataset_path, tokenizer, split='train')
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer, return_tensors='pt')
 
     # PPO Trainer.
-    config, ppo_trainer = build_trainer(args, tokenizer, dataset)
+    config, ppo_trainer = build_trainer(
+        args=args,
+        tokenizer=tokenizer,
+        dataset=dataset,
+        data_collator=data_collator,
+    )
 
     gen_kwargs = {
         'top_k': 0.0,

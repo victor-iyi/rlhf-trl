@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from typing import Any
 
 from accelerate import Accelerator
@@ -18,6 +19,7 @@ def build_trainer(
     args: ScriptArgs,
     tokenizer: AutoTokenizer,
     dataset: Dataset,
+    data_collator: Callable[..., Any] | None = None,
     **lora_kwargs: Any,
 ) -> tuple[PPOConfig, PPOTrainer]:
     """Build the PPO trainer.
@@ -63,7 +65,7 @@ def build_trainer(
         ref_model=ref_model,
         tokenizer=tokenizer,
         dataset=dataset,
-        # data_collator=collator,
+        data_collator=data_collator,
         optimizer=optimizer,
     )
 

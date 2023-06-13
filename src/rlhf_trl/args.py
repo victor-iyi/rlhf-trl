@@ -51,7 +51,7 @@ class ScriptArgs:
     )
 
     output_max_length: int | None = field(
-        default=1024,
+        default=256,
         metadata={
             'help': 'The maximum length of the output sequence for generation.',
         },
@@ -72,7 +72,7 @@ class ScriptArgs:
     )
 
     batch_size: int | None = field(
-        default=32,
+        default=8,
         metadata={
             'help': 'The batch size to use for PPO.',
         },
@@ -128,7 +128,7 @@ class ScriptArgs:
     )
 
     save_freq: int | None = field(
-        default=None,
+        default=100,
         metadata={
             'help': 'The frequency with which to save the model.',
         },
