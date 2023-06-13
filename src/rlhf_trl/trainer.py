@@ -11,6 +11,7 @@ from transformers import AutoTokenizer
 from trl import PPOConfig
 from trl import PPOTrainer
 from trl import set_seed
+# from trl import create_reference_model
 
 
 def build_trainer(
@@ -44,6 +45,8 @@ def build_trainer(
         device_map={'': current_device},
         peft_config=lora_config,
     )
+    # ref_model = create_reference_model(model, num_shared_layers=6)
+    ref_model = None
 
     optimizer = None
     if args.adafactor:
@@ -55,9 +58,9 @@ def build_trainer(
             lr=config.learning_rate,
         )
     trainer = PPOTrainer(
-        model=model,
         config=config,
-        ref_model=None,
+        model=model,
+        ref_model=ref_model,
         tokenizer=tokenizer,
         dataset=dataset,
         # data_collator=collator,

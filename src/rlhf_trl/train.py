@@ -1,6 +1,9 @@
+import torch
+from core import get_ner
 from rlhf_trl.args import parse_args
 from rlhf_trl.data import get_tokenizer
 from rlhf_trl.data import load_data
+from rlhf_trl.reward import reward_fn
 from rlhf_trl.trainer import build_trainer
 from tqdm import tqdm
 from trl.core import LengthSampler
@@ -31,14 +34,16 @@ def train() -> None:
         args.output_max_length,
     )
 
-    # device = ppo_trainer.accelerator.device
-    # if ppo_trainer.accelerator.num_processes == 1:
-    #     device = (
-    #         'cuda' if torch.cuda.is_available()
-    #         else 'mps'
-    #         if torch.backends.mps.is_available() and torch.backends.mps.is_built()
-    #         else 'cpu',
-    #     )
+    device = ppo_trainer.accelerator.device
+    if ppo_trainer.accelerator.num_processes == 1:
+        device = (
+            'cuda' if torch.cuda.is_available()
+            else 'mps'
+            if torch.backends.mps.is_available() and torch.backends.mps.is_built()
+            else 'cpu',
+        )
+
+    nlp = get_ner(device=device, resolve_text=True, size='small')
 
     for epoch, batch in tqdm(enumerate(ppo_trainer.dataloader)):
         if epoch >= config.total_ppo_epochs:
@@ -57,8 +62,12 @@ def train() -> None:
         )
 
         # TODO: Compute reward score.
+        scores = reward_fn(nlp, batch['prompt'], batch['response'])
+        rewards = [torch.tensor(score[0] - args.reward_baseline) for score in scores]
 
         # TODO: Run the PPO step.
+        stats = ppo_trainer.step(prompt_tensors, response_tensors, rewards)
+        ppo_trainer.log_stats(stats, batch, rewards)
 
         # Save the model.
         if args.save_freq and epoch and epoch % args.save_freq == 0:
