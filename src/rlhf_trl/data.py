@@ -30,7 +30,6 @@ def load_data(
     assert split in ['train', 'test'], 'split must be either train or test.'
 
     path = os.path.join(path, f'{split}.jsonl')
-    print(os.path.abspath(path))
     if not os.path.exists(path):
         raise FileNotFoundError(f'{path} does not exist.')
 
@@ -56,7 +55,7 @@ def load_data(
 
     ds = Dataset.from_dict(
         {
-            'prompts': prompts,
+            'query': prompts,
             'input_ids': input_ids,
         }, split=Split.TRAIN if split == 'train' else Split.TEST,
     )

@@ -72,14 +72,14 @@ class ScriptArgs:
     )
 
     batch_size: int | None = field(
-        default=8,
+        default=16,
         metadata={
             'help': 'The batch size to use for PPO.',
         },
     )
 
     ppo_epochs: int | None = field(
-        default=4,
+        default=20,
         metadata={
             'help': 'The number of PPO epochs.',
         },
@@ -128,7 +128,7 @@ class ScriptArgs:
     )
 
     save_freq: int | None = field(
-        default=100,
+        default=50,
         metadata={
             'help': 'The frequency with which to save the model.',
         },

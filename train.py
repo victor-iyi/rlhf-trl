@@ -2,14 +2,13 @@ import torch
 from rlhf_trl.args import parse_args
 from rlhf_trl.data import get_tokenizer
 from rlhf_trl.data import load_data
+from rlhf_trl.data import collator
 from rlhf_trl.reward import reward_fn
 from rlhf_trl.trainer import build_trainer
 from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification
 from transformers import AutoTokenizer
-from transformers import DataCollatorWithPadding
 from trl.core import LengthSampler
-# from rlhf_trl.data import collator
 
 
 def main() -> None:
@@ -21,14 +20,13 @@ def main() -> None:
     # Tokenizer & dataset.
     tokenizer = get_tokenizer(args.tokenizer_name)
     dataset = load_data(args.dataset_path, tokenizer, split='train')
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer, return_tensors='pt')
 
     # PPO Trainer.
     config, ppo_trainer = build_trainer(
         args=args,
         tokenizer=tokenizer,
         dataset=dataset,
-        data_collator=data_collator,
+        data_collator=collator,
     )
 
     gen_kwargs = {
@@ -56,12 +54,14 @@ def main() -> None:
     reward_model = AutoModelForSequenceClassification.from_pretrained(
         args.reward_model_name,
     )
+    reward_model = reward_model.to(device)
     reward_tokenizer = AutoTokenizer.from_pretrained(
         args.reward_model_name,
     )
 
+    print(f'Using device: {device}')
     # Training loop.
-    for epoch, batch in tqdm(enumerate(ppo_trainer.dataloader)):
+    for epoch, batch in tqdm(enumerate(ppo_trainer.dataloader), desc='Training PPO'):
         if epoch >= config.total_ppo_epochs:
             break
 
@@ -77,11 +77,11 @@ def main() -> None:
             skip_special_tokens=True,
         )
 
-        # TODO: Compute reward score.
+        # Compute reward score.
         scores = reward_fn(
             model=reward_model,
             tokenizer=reward_tokenizer,
-            prompt_text=batch['prompt'],
+            prompt_text=batch['query'],
             response_text=batch['response'],
             device=device,
         )
@@ -90,7 +90,7 @@ def main() -> None:
             for score in scores
         ]
 
-        # TODO: Run the PPO step.
+        # Run the PPO step.
         stats = ppo_trainer.step(prompt_tensors, response_tensors, rewards)
         ppo_trainer.log_stats(stats, batch, rewards)
 

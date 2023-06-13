@@ -9,7 +9,7 @@ def reward_fn(
     tokenizer: AutoTokenizer,
     prompt_text: list[str],
     response_text: list[str],
-    device: str = 'cpu',
+    device: str,
 ) -> list[torch.FloatTensor]:
     """Compute the reward for a given response to a prompt.
 
@@ -25,7 +25,13 @@ def reward_fn(
 
     """
     with torch.no_grad():
-        encoding = tokenizer(prompt_text, response_text, return_tensors='pt')
+        encoding = tokenizer(
+            prompt_text,
+            response_text,
+            truncation=True,
+            max_length=512,
+            padding='max_length',
+            return_tensors='pt')
         encoding = encoding.to(device)
 
         logits = model(**encoding).logits

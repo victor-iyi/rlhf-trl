@@ -67,3 +67,5 @@ dmypy.json
 
 # Project ignores
 res/*
+wandb/
+experiments/
