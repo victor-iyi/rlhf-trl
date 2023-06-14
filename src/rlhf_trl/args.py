@@ -10,30 +10,23 @@ class ScriptArgs:
     """The name of the Causal LM wwe wish to fine-tune with PPO."""
 
     sft_model_name: str | None = field(
-        default='YurtsAI/qa-manuals-pythia-2.8b-lr-1e-5-cl-2048-epoch-1_file0_step215_totaltokens1.7613M',
+        default='',
         metadata={
             'help': 'The name of the SFT model we wish to fine-tune with PPO.',
         },
     )
 
     tokenizer_name: str | None = field(
-        default='OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5',
+        default='',
         metadata={
             'help': 'The name of the tokenizer to use.',
         },
     )
 
     reward_model_name: str | None = field(
-        default='OpenAssistant/reward-model-deberta-v3-base',
+        default='',
         metadata={
             'help': 'The name of the reward model to use.',
-        },
-    )
-
-    reward_size: str | None = field(
-        default='large',
-        metadata={
-            'help': 'The size of the reward model to use. (large or small)',
         },
     )
 
@@ -45,7 +38,7 @@ class ScriptArgs:
     )
 
     dataset_path: str | None = field(
-        default='res/tech-crunch-qa/',
+        default='res/data/',
         metadata={
             'help': 'The path to the dataset.',
         },
@@ -66,9 +59,9 @@ class ScriptArgs:
     )
 
     eval_name: str | None = field(
-        default='tech-crunch-qa',
+        default='rlhf_eval',
         metadata={
-            'help': 'The name of the evaluation file.',
+            'help': 'The name of the evaluation file without extension.',
         },
     )
 

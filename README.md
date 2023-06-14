@@ -1,3 +1,4 @@
+<!-- markdownlint-disable MD013 -->
 # Reinforcement Learning from Human Feedback w/ TRL
 
 [![formatter | docformatter](https://img.shields.io/badge/%20formatter-docformatter-fedcba.svg)](https://github.com/PyCQA/docformatter)
@@ -7,6 +8,13 @@ Reinforcement learning from Human Feedback (RLHF) has been widely adopted in
 recent times by the Artificial Intelligence industry.
 
 Here, we build a simple RLHF pipeline using the 🤗[`trl`] library.
+
+## Setup
+
+```sh
+python scripts/train.py --help
+
+```
 
 ## Contribution
 

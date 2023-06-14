@@ -124,17 +124,6 @@ def evaluate(args: ScriptArgs) -> None:
         'eos_token_id': tokenizer.eos_token_id,
     }
 
-    # data = {
-    #     'prompt': [],
-    #     'sft_output': [],
-    #     'sft_scores': [],
-    #     'ppo_output': [],
-    #     'ppo_scores': [],
-    #     'oa_ans': [],
-    #     'oa_score': [],
-    #     'chatgpt_ans': [],
-    #     'chatgpt_score': [],
-    # }
     data = []
 
     # 4. Make prediction with each model on the test data.

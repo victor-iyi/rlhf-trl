@@ -2,17 +2,16 @@ import os
 import time
 
 import torch
-from core import get_ner
 from rlhf_trl.args import parse_args
 from rlhf_trl.data import collator
 from rlhf_trl.data import get_tokenizer
 from rlhf_trl.data import load_data
-from rlhf_trl.reward import reward_shaping_fn
+from rlhf_trl.reward import reward_fn
 from rlhf_trl.trainer import build_trainer
 from tqdm import tqdm
 from trl.core import LengthSampler
-# from transformers import AutoModelForSequenceClassification
-# from transformers import AutoTokenizer
+from transformers import AutoModelForSequenceClassification
+from transformers import AutoTokenizer
 
 
 def main() -> None:
@@ -55,14 +54,13 @@ def main() -> None:
         )
 
     # Reward model.
-    # reward_model = AutoModelForSequenceClassification.from_pretrained(
-    #     args.reward_model_name,
-    # )
-    # reward_model = reward_model.to(device)
-    # reward_tokenizer = AutoTokenizer.from_pretrained(
-    #     args.reward_model_name,
-    # )
-    nlp = get_ner(device=device, resolve_text=True, size=args.reward_size)
+    reward_model = AutoModelForSequenceClassification.from_pretrained(
+        args.reward_model_name,
+    )
+    reward_model = reward_model.to(device)
+    reward_tokenizer = AutoTokenizer.from_pretrained(
+        args.reward_model_name,
+    )
 
     ppo_trainer.accelerator.print(f'Using device: {device}')
     start_time = time.time()
@@ -84,10 +82,12 @@ def main() -> None:
         )
 
         # Compute reward score.
-        scores = reward_shaping_fn(
-            nlp=nlp,
+        scores = reward_fn(
+            model=reward_model,
+            tokenizer=reward_tokenizer,
             prompt_text=batch['prompt'],
             response_text=batch['response'],
+            device=device,
         )
         rewards = [
             torch.tensor(score - args.reward_baseline)
