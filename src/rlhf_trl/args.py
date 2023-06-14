@@ -30,6 +30,13 @@ class ScriptArgs:
         },
     )
 
+    reward_size: str | None = field(
+        default='large',
+        metadata={
+            'help': 'The size of the reward model to use. (large or small)',
+        },
+    )
+
     ppo_model_name: str | None = field(
         default='',
         metadata={
