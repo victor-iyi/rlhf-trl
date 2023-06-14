@@ -75,8 +75,8 @@ def evaluate(args: ScriptArgs) -> None:
         args (ScriptArgs): The script arguments.
 
     """
-    tokenizer = get_tokenizer(args.tokenizer_name, padding_side='left')
     # 1. Load the test data.
+    tokenizer = get_tokenizer(args.tokenizer_name, padding_side='left')
     ds = load_data_v2(
         path=args.dataset_path,
         tokenizer=tokenizer,
@@ -123,7 +123,6 @@ def evaluate(args: ScriptArgs) -> None:
         'pad_token_id': tokenizer.pad_token_id,
         'eos_token_id': tokenizer.eos_token_id,
     }
-
     data = []
 
     # 4. Make prediction with each model on the test data.
@@ -137,9 +136,9 @@ def evaluate(args: ScriptArgs) -> None:
             return_dict_in_generate=True,
             **gen_kwargs,
         )
+        # Return the outputs excluding the prompt.
         sft_seq_len = len(sft_encode['scores'])
         sft_tokens = sft_encode['sequences'][:, -sft_seq_len:]
-
         sft_output = tokenizer.batch_decode(sft_tokens, skip_special_tokens=True)
 
         # 4.2. Make prediction with ppo_model.
@@ -149,6 +148,7 @@ def evaluate(args: ScriptArgs) -> None:
             return_dict_in_generate=True,
             **gen_kwargs,
         )
+        # Return the outputs excluding the prompt.
         ppo_seq_len = len(ppo_encode['scores'])
         ppo_tokens = ppo_encode['sequences'][:, -ppo_seq_len:]
         ppo_output = tokenizer.batch_decode(ppo_tokens, skip_special_tokens=True)

@@ -9,9 +9,9 @@ from rlhf_trl.data import load_data
 from rlhf_trl.reward import reward_fn
 from rlhf_trl.trainer import build_trainer
 from tqdm import tqdm
-from trl.core import LengthSampler
 from transformers import AutoModelForSequenceClassification
 from transformers import AutoTokenizer
+from trl.core import LengthSampler
 
 
 def main() -> None:

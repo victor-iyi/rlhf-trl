@@ -58,4 +58,3 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     scores = reward_fn(model, tokenizer, prompt_text, response_text, device)
     print(scores)
-
